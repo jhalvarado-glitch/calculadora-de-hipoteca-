@@ -1,0 +1,1304 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Simulador Inmobiliario Inteligente - Portable</title>
+  <!-- Tailwind CSS CDN para renderizado hermoso -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      transition: background-color 0.5s ease, color 0.5s ease;
+    }
+    .font-display {
+      font-family: 'Outfit', sans-serif;
+    }
+    .font-mono-custom {
+      font-family: 'JetBrains Mono', monospace;
+    }
+    /* Glassmorphism custom classes */
+    .glass-effect {
+      backdrop-filter: blur(16px) saturate(180%);
+      -webkit-backdrop-filter: blur(16px) saturate(180%);
+    }
+
+    .glass-panel {
+      backdrop-filter: blur(20px) saturate(190%);
+      -webkit-backdrop-filter: blur(20px) saturate(190%);
+      transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .dark .glass-panel {
+      background-color: rgba(15, 23, 42, 0.45);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.35);
+    }
+
+    body:not(.dark) .glass-panel {
+      background-color: rgba(255, 255, 255, 0.45);
+      border: 1px solid rgba(255, 255, 255, 0.45);
+      box-shadow: 0 12px 40px 0 rgba(15, 23, 42, 0.04);
+    }
+
+    .glass-subcard {
+      backdrop-filter: blur(10px) saturate(150%);
+      -webkit-backdrop-filter: blur(10px) saturate(150%);
+      transition: all 0.2s ease;
+    }
+
+    .dark .glass-subcard {
+      background-color: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    body:not(.dark) .glass-subcard {
+      background-color: rgba(255, 255, 255, 0.3);
+      border: 1px solid rgba(0, 0, 0, 0.04);
+    }
+
+    .glass-header {
+      backdrop-filter: blur(24px) saturate(200%);
+      -webkit-backdrop-filter: blur(24px) saturate(200%);
+      transition: background-color 0.3s ease, border-color 0.3s ease;
+    }
+
+    .dark .glass-header {
+      background-color: rgba(15, 23, 42, 0.65);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    body:not(.dark) .glass-header {
+      background-color: rgba(255, 255, 255, 0.65);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .glass-input {
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .dark .glass-input {
+      background-color: rgba(15, 23, 42, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: #f8fafc;
+    }
+
+    .dark .glass-input:focus {
+      background-color: rgba(15, 23, 42, 0.7);
+      border-color: rgba(16, 185, 129, 0.6);
+      box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
+    }
+
+    body:not(.dark) .glass-input {
+      background-color: rgba(255, 255, 255, 0.5);
+      border: 1px solid rgba(0, 0, 0, 0.09);
+      color: #0f172a;
+    }
+
+    body:not(.dark) .glass-input:focus {
+      background-color: rgba(255, 255, 255, 0.9);
+      border-color: rgba(16, 185, 129, 0.5);
+      box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
+    }
+
+    .glass-button-secondary {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      font-weight: 700;
+      padding: 0.75rem 1.25rem;
+      border-radius: 0.75rem;
+      font-size: 0.75rem;
+      transition: all 0.3s ease;
+      border: 1px solid;
+      cursor: pointer;
+      backdrop-filter: blur(8px);
+    }
+
+    .dark .glass-button-secondary {
+      background-color: rgba(255, 255, 255, 0.04);
+      border-color: rgba(255, 255, 255, 0.09);
+      color: #f1f5f9;
+    }
+
+    .dark .glass-button-secondary:hover {
+      background-color: rgba(255, 255, 255, 0.09);
+      border-color: rgba(255, 255, 255, 0.15);
+      transform: translateY(-1px);
+    }
+
+    body:not(.dark) .glass-button-secondary {
+      background-color: rgba(255, 255, 255, 0.55);
+      border-color: rgba(0, 0, 0, 0.07);
+      color: #334155;
+    }
+
+    body:not(.dark) .glass-button-secondary:hover {
+      background-color: rgba(255, 255, 255, 0.85);
+      border-color: rgba(0, 0, 0, 0.1) ;
+      transform: translateY(-1px);
+    }
+
+    /* Ambient blurs */
+    .ambient-glow-1 {
+      position: absolute;
+      width: 40vw;
+      height: 40vw;
+      max-width: 500px;
+      max-height: 500px;
+      border-radius: 100%;
+      filter: blur(120px);
+      z-index: -10;
+      pointer-events: none;
+      opacity: 0.25;
+      transition: opacity 1s ease;
+    }
+
+    .dark .ambient-glow-1 {
+      background: radial-gradient(circle, rgba(16, 185, 129, 0.2) 0%, rgba(99, 102, 241, 0.05) 100%);
+      top: -10%;
+      left: -5%;
+    }
+
+    body:not(.dark) .ambient-glow-1 {
+      background: radial-gradient(circle, rgba(16, 185, 129, 0.18) 0%, rgba(59, 130, 246, 0.05) 100%);
+      top: -10%;
+      left: -5%;
+    }
+
+    .ambient-glow-2 {
+      position: absolute;
+      width: 35vw;
+      height: 35vw;
+      max-width: 450px;
+      max-height: 450px;
+      border-radius: 100%;
+      filter: blur(100px);
+      z-index: -10;
+      pointer-events: none;
+      opacity: 0.2;
+      transition: opacity 1s ease;
+    }
+
+    .dark .ambient-glow-2 {
+      background: radial-gradient(circle, rgba(99, 102, 241, 0.18) 0%, rgba(139, 92, 246, 0) 100%);
+      bottom: 20%;
+      right: -5%;
+    }
+
+    body:not(.dark) .ambient-glow-2 {
+      background: radial-gradient(circle, rgba(147, 51, 234, 0.12) 0%, rgba(59, 130, 246, 0.02) 100%);
+      bottom: 20%;
+      right: -5%;
+    }
+
+    /* Scrollbars */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    .dark ::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 9999px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: rgba(0, 0, 0, 0.12);
+      border-radius: 9999px;
+    }
+
+    /* Sliders styling */
+    input[type="range"] {
+      accent-color: #10b981;
+    }
+
+    .dark {
+      background: radial-gradient(circle at top left, #0e111d 0%, #0c0d16 50%, #05060b 100%);
+    }
+
+    body:not(.dark) {
+      background: radial-gradient(circle at top left, #f3fcf8 0%, #eff4f9 50%, #e5ebf5 100%);
+    }
+
+    @media print {
+      .no-print {
+        display: none !important;
+      }
+      body {
+        background: white !important;
+        color: black !important;
+      }
+    }
+  </style>
+</head>
+<body class="min-h-screen text-slate-900 font-sans relative overflow-x-hidden">
+
+  <!-- Ambient light spheres -->
+  <div class="ambient-glow-1"></div>
+  <div class="ambient-glow-2"></div>
+
+  <!-- Corporate Header Glassmorphic -->
+  <header class="glass-header border-b no-print sticky top-0 z-40 border-slate-200/50">
+    <div class="max-w-7xl mx-auto px-4 py-4 flex flex-col md:flex-row justify-between items-center gap-4">
+      <div class="flex items-center gap-3">
+        <div class="p-2.5 rounded-xl border transition-colors bg-emerald-500/10 border-emerald-500/20 text-emerald-600" id="header-logo-container">
+          <!-- House Icon SVG -->
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        </div>
+        <div>
+          <h1 class="text-xl font-extrabold tracking-tight font-display bg-gradient-to-r from-emerald-600 to-indigo-500 bg-clip-text text-transparent" id="header-title">
+            Simulador Inmobiliario Inteligente
+          </h1>
+          <p class="text-[11px] font-medium leading-tight text-slate-500" id="header-subtitle">
+            Un Asesor Financiero Senior Portable en tu Bolsillo
+          </p>
+        </div>
+      </div>
+      
+      <div class="flex items-center gap-2.5">
+        <!-- Toggle Light / Dark -->
+        <button
+          onclick="toggleDarkMode()"
+          class="p-2.5 rounded-xl border border-slate-900/10 bg-slate-900/5 hover:bg-slate-900/10 text-emerald-700 transition duration-300 cursor-pointer"
+          aria-label="Toggle theme"
+          id="theme-toggle"
+        >
+          <!-- Sun / Moon indicators inside javascript toggler -->
+          <span id="theme-icon">🌙</span>
+        </button>
+
+        <button
+          onclick="window.print()"
+          class="flex items-center gap-1.5 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white font-bold px-4.5 py-2.5 rounded-xl text-xs transition shadow-md hover:scale-102 active:scale-98 cursor-pointer"
+          id="btn-print"
+        >
+          <!-- Printer icon SVG -->
+          <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/></svg>
+          <span>Imprimir Informe</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Print Letterhead -->
+  <div class="hidden print:block text-slate-950 p-6 border-b border-slate-300 mb-8 bg-white">
+    <div class="flex justify-between items-center">
+      <div>
+        <h1 class="text-2xl font-black text-emerald-950 font-display">INFORME DE CONTROL HIPOTECARIO</h1>
+        <p class="text-xs text-slate-500">Estimación de viabilidad patrimonial independiente de red</p>
+      </div>
+      <div class="text-right">
+        <p class="text-xs font-bold font-mono-custom text-emerald-750">INFORME AUTÓNOMO</p>
+        <p class="text-[10px] text-slate-400 mt-0.5" id="print-date">Generado de forma portátil</p>
+      </div>
+    </div>
+  </div>
+
+  <main class="max-w-7xl mx-auto px-4 py-8 space-y-8 relative z-10">
+    
+    <!-- Bienvenido y Selector de Pestañas glass -->
+    <div class="p-6 rounded-3xl border shadow-lg no-print glass-panel" id="tab-container-card">
+      <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-5">
+        <div>
+          <div class="flex items-center gap-2 text-emerald-500 font-bold text-xs uppercase tracking-wider mb-1">
+            <span>✨ Análisis Financiero de Vivienda</span>
+          </div>
+          <h2 class="text-2xl font-black tracking-tight font-display">¿Cuál es tu estrategia hipotecaria?</h2>
+          <p class="text-xs mt-1 text-slate-500" id="tab-description">
+            Selecciona entre evaluar cuál es tu precio de compra objetivo o calcular presupuestos para un inmueble que ya tienes visto.
+          </p>
+        </div>
+
+        <div class="flex p-1 rounded-xl w-full md:w-auto bg-black/5 border border-black/5" id="mode-tabs">
+          <button
+            onclick="setActiveTab('precio')"
+            id="tab-precio"
+            class="flex-1 md:flex-initial text-center px-5 py-2.5 text-xs font-bold rounded-lg transition-all duration-200 cursor-pointer bg-white text-emerald-950 shadow-sm border border-emerald-100"
+          >
+            Estimar Presupuesto de Compra
+          </button>
+          <button
+            onclick="setActiveTab('cuota')"
+            id="tab-cuota"
+            class="flex-1 md:flex-initial text-center px-5 py-2.5 text-xs font-bold rounded-lg transition-all duration-200 cursor-pointer text-slate-500 hover:text-slate-700"
+          >
+            Analizar Propiedad Específica
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Grid de Simulación -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+      
+      <!-- Input Aside Columna (5 Cols No Print) -->
+      <aside class="lg:col-span-5 space-y-6 no-print">
+        <div class="p-6 rounded-3xl border shadow-lg space-y-6 glass-panel" id="form-inputs-card">
+          
+          <div class="flex items-center gap-2 pb-3 border-b border-dashed border-slate-200/50" id="header-dashed-divider">
+            <span class="text-emerald-500 text-lg">🧮</span>
+            <h3 class="font-bold text-lg font-display tracking-tight">Estudios de Viabilidad</h3>
+          </div>
+
+          <!-- Parámetros económicos directos -->
+          <div class="space-y-4">
+            <div>
+              <div class="flex justify-between items-center mb-1.5">
+                <label class="text-xs font-bold text-slate-505 flex items-center gap-1.5" htmlFor="inp-salary">
+                  <span>Sueldo Neto Mensual (€)</span>
+                </label>
+                <span class="text-xs font-black font-mono-custom text-emerald-500" id="indicator-salary">3.200 €</span>
+              </div>
+              <input
+                type="number"
+                id="inp-salary"
+                value="3200"
+                oninput="onInputChanged('salary', this.value)"
+                class="w-full text-sm font-semibold rounded-xl px-4 py-3 focus:outline-none glass-input"
+              />
+              <input
+                type="range"
+                id="range-salary"
+                min="800"
+                max="12000"
+                step="100"
+                value="3200"
+                oninput="onSliderChanged('salary', this.value)"
+                class="w-full mt-2 cursor-pointer h-1.5 rounded-lg appearance-none bg-slate-200"
+              />
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-xs font-semibold text-slate-500 mb-1.5" htmlFor="inp-extra">Ingresos Adicionales (€)</label>
+                <input
+                  type="number"
+                  id="inp-extra"
+                  value="450"
+                  oninput="onInputChanged('additionalIncome', this.value)"
+                  class="w-full text-sm font-semibold rounded-xl px-4 py-3 focus:outline-none glass-input"
+                />
+              </div>
+
+              <div>
+                <label class="block text-xs font-semibold text-slate-500 mb-1.5" htmlFor="inp-expenses">Gastos Fijos Mensuales (€)</label>
+                <input
+                  type="number"
+                  id="inp-expenses"
+                  value="900"
+                  oninput="onInputChanged('expenses', this.value)"
+                  class="w-full text-sm font-semibold rounded-xl px-4 py-3 focus:outline-none glass-input"
+                />
+              </div>
+            </div>
+
+            <div>
+              <div class="flex justify-between items-center mb-1.5">
+                <label class="text-xs font-semibold text-slate-500" htmlFor="inp-savings">Fondos Ahorrados para Entrada (€)</label>
+                <span class="text-xs font-bold font-mono-custom text-indigo-500" id="indicator-savings">45.000 €</span>
+              </div>
+              <input
+                type="number"
+                id="inp-savings"
+                value="45000"
+                oninput="onInputChanged('savings', this.value)"
+                class="w-full text-sm font-semibold rounded-xl px-4 py-3 focus:outline-none glass-input"
+              />
+            </div>
+
+            <div class="grid grid-cols-2 gap-4 pb-1">
+              <div>
+                <label class="block text-xs font-semibold text-slate-505 mb-1.5" htmlFor="sel-civil-status">Estado Civil</label>
+                <select
+                  id="sel-civil-status"
+                  onchange="onInputChanged('civilStatus', this.value)"
+                  class="w-full text-sm font-semibold rounded-xl px-3 py-3 focus:outline-none glass-input"
+                >
+                  <option value="soltero">Soltero</option>
+                  <option value="casado" selected>Casado</option>
+                  <option value="union_libre">Unión libre</option>
+                  <option value="divorciado">Divorciado</option>
+                </select>
+              </div>
+
+              <div>
+                <div class="flex justify-between items-center mb-1.5">
+                  <label class="text-xs font-semibold text-slate-500" htmlFor="display-dependents">Dependientes</label>
+                </div>
+                <div class="flex items-center justify-between rounded-xl p-1 border border-slate-200/50 glass-subcard">
+                  <button
+                    onclick="changeDependents(-1)"
+                    class="w-8 h-8 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 active:scale-95 text-emerald-500 font-bold text-sm transition shadow-sm flex items-center justify-center cursor-pointer"
+                  >
+                    -
+                  </button>
+                  <span id="display-dependents" class="text-sm font-extrabold font-mono-custom">1</span>
+                  <button
+                    onclick="changeDependents(1)"
+                    class="w-8 h-8 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 active:scale-95 text-emerald-500 font-bold text-sm transition shadow-sm flex items-center justify-center cursor-pointer"
+                  >
+                    +
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Parámetros del Préstamos -->
+            <div class="border-t border-dashed border-slate-200/50 pt-4 space-y-4" id="mortgage-dashed-divider">
+              <div>
+                <div class="flex justify-between items-center mb-1.5">
+                  <label class="text-xs font-semibold text-slate-505 flex items-center gap-1" htmlFor="inp-rate">
+                    <span>Tasa de Interés (%)</span>
+                  </label>
+                  <span class="text-xs font-bold font-mono-custom text-emerald-500" id="indicator-rate">3.2%</span>
+                </div>
+                <input
+                  type="number"
+                  id="inp-rate"
+                  value="3.2"
+                  step="0.1"
+                  oninput="onInputChanged('interestRate', this.value)"
+                  class="w-full text-sm font-semibold rounded-xl px-4 py-3 focus:outline-none glass-input"
+                />
+                <input
+                  type="range"
+                  id="range-rate"
+                  min="0.5"
+                  max="9.0"
+                  step="0.1"
+                  value="3.2"
+                  oninput="onSliderChanged('interestRate', this.value)"
+                  class="w-full mt-2 cursor-pointer h-1.5 rounded-lg appearance-none bg-slate-200"
+                />
+              </div>
+
+              <div>
+                <label class="block text-xs font-semibold text-slate-505 mb-1.5" htmlFor="sel-term">Plazo de Hipoteca: <span class="text-emerald-500" id="indicator-term-text">20 años</span></label>
+                <select
+                  id="sel-term"
+                  onchange="onInputChanged('termYears', this.value)"
+                  class="w-full text-sm font-semibold rounded-xl px-3 py-3 focus:outline-none glass-input"
+                >
+                  <option value="5">5 años</option>
+                  <option value="10">10 años</option>
+                  <option value="15">15 años</option>
+                  <option value="20" selected>20 años</option>
+                  <option value="25">25 años</option>
+                  <option value="30">30 años</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Escenario Cuota Específica -->
+            <div id="group-cuota-inputs" class="hidden border border-dashed border-emerald-500/20 pt-4 space-y-4 bg-emerald-500/5 p-4 rounded-2xl glass-subcard">
+              <span class="text-[10px] font-extrabold uppercase text-emerald-500 tracking-wider flex items-center gap-1.5">
+                <span>🏠 Análisis de Escenario Concreto</span>
+              </span>
+
+              <div>
+                <label class="block text-xs font-semibold text-slate-500 mb-1.5" htmlFor="inp-prop-price">Precio de la Vivienda Comercial (€)</label>
+                <input
+                  type="number"
+                  id="inp-prop-price"
+                  value="250000"
+                  oninput="onInputChanged('propertyPrice', this.value)"
+                  class="w-full text-sm font-bold rounded-xl px-4 py-3 focus:outline-none glass-input border border-emerald-500/30"
+                />
+              </div>
+
+              <div>
+                <div class="flex justify-between items-center mb-1.5">
+                  <label class="text-xs font-semibold text-slate-550" htmlFor="inp-dp-percent">Porcentaje de Entrada Inicial (%)</label>
+                  <span class="text-xs font-bold text-emerald-500 font-mono-custom" id="indicator-dp-equivalent">
+                    50.000 € (20%)
+                  </span>
+                </div>
+                <input
+                  type="number"
+                  id="inp-dp-percent"
+                  value="20"
+                  oninput="onInputChanged('downPaymentPercent', this.value)"
+                  class="w-full text-sm font-semibold rounded-xl px-4 py-3 focus:outline-none glass-input"
+                />
+                <input
+                  type="range"
+                  id="range-dp-percent"
+                  min="0"
+                  max="95"
+                  step="1"
+                  value="20"
+                  oninput="onSliderChanged('downPaymentPercent', this.value)"
+                  class="w-full mt-2 cursor-pointer h-1.5 rounded-lg appearance-none bg-slate-200"
+                />
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </aside>
+
+      <!-- Panel de Diagnóstico Resultados (7 columns) -->
+      <section class="lg:col-span-7 space-y-8">
+        
+        <!-- Tarjetas de Diagnóstico e Impacto -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          
+          <!-- Tarjeta Principal (Resultado) -->
+          <div class="p-6 rounded-3xl shadow-lg border hover:shadow-xl hover:scale-[1.01] transition-all relative overflow-hidden group glass-panel bg-gradient-to-br from-emerald-50/70 to-emerald-100/30 border-emerald-500/20" id="card-result-1">
+            <span class="text-xxs font-extrabold uppercase tracking-widest block mb-2 text-emerald-600" id="result-label-1">
+              PRESUPUESTO TOPE RECOMENDADO
+            </span>
+            <div class="text-3.5xl font-black font-display tracking-tight text-emerald-900 leading-none mt-1 font-mono-custom" id="result-val-1">
+              --
+            </div>
+            <p class="text-xxs mt-3 font-medium leading-relaxed text-slate-600" id="result-desc-1">
+              Asumiendo entrada y capital financiado prudente.
+            </p>
+            
+            <button
+              onclick="syncMaxPriceToProperty()"
+              id="btn-sync-suggestion"
+              class="w-full mt-4 bg-emerald-500 hover:bg-emerald-400 text-emerald-950 text-xxs font-black tracking-wider uppercase py-2.5 px-3 rounded-xl flex items-center justify-center gap-1.5 transition no-print shadow-sm cursor-pointer"
+            >
+              <span>Analizar este Precio de Vivienda</span>
+              <span>➡️</span>
+            </button>
+          </div>
+
+          <!-- Tarjeta Secundaria (Diferencia) -->
+          <div class="p-6 rounded-3xl border shadow-lg hover:shadow-xl hover:scale-[1.01] transition-all relative overflow-hidden group glass-panel border-slate-200/85" id="card-result-2">
+            <span class="text-xxs font-extrabold uppercase tracking-widest block mb-1.5 text-slate-400" id="result-label-2">
+              CUOTA MAXIMA PERMITIDA
+            </span>
+            <div class="text-3xl font-bold font-display tracking-tight text-emerald-500 font-mono-custom" id="result-val-2">
+              --
+            </div>
+            <p class="text-xxs mt-3 font-medium leading-relaxed text-slate-400" id="result-desc-2">
+              Límite sugerido según perfil residencial y de ingresos.
+            </p>
+          </div>
+
+        </div>
+
+        <!-- Bento de Métricas Rápidas -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div class="p-4 rounded-2xl border transition-all glass-panel">
+            <span class="text-xxs font-bold text-slate-400 uppercase tracking-wider block">Ingreso Neto Disponible</span>
+            <span class="text-sm font-extrabold font-mono-custom block mt-1 text-slate-700 dark:text-slate-200" id="bento-val-1">--</span>
+            <span class="text-[10px] text-slate-400 font-medium">(Ingresos - Gastos fijos)</span>
+          </div>
+
+          <div class="p-4 rounded-2xl border transition-all glass-panel">
+            <span class="text-xxs font-bold text-slate-400 uppercase tracking-wider block">Endeudamiento Permitido</span>
+            <span class="text-sm font-extrabold font-mono-custom block mt-1 text-slate-700 dark:text-slate-200" id="bento-val-2">--</span>
+            <span class="text-[10px] text-slate-400 font-medium">Límite prudente óptimo</span>
+          </div>
+
+          <div class="p-4 rounded-2xl border transition-all glass-panel">
+            <span class="text-xxs font-bold text-slate-400 uppercase tracking-wider block">Capital Financiado</span>
+            <span class="text-sm font-extrabold font-mono-custom text-emerald-500 block mt-1" id="bento-val-3">--</span>
+            <span class="text-[10px] text-slate-400 font-medium">Importe del préstamo</span>
+          </div>
+
+          <div class="p-4 rounded-2xl border transition-all glass-panel">
+            <span class="text-xxs font-bold text-slate-400 uppercase tracking-wider block">Intereses Totales</span>
+            <span class="text-sm font-extrabold font-mono-custom text-amber-500 block mt-1" id="bento-val-4">--</span>
+            <span class="text-[10px] text-slate-400 font-medium">Cargos por hipoteca</span>
+          </div>
+        </div>
+
+        <!-- Bento de Gráficos Financieros -->
+        <div class="p-6 rounded-3xl border shadow-lg glass-panel" id="visual-charts-panel">
+          <div class="flex justify-between items-center mb-6">
+            <h4 class="font-extrabold font-display tracking-tight text-slate-800 dark:text-white">Estructura Financiera del Negocio</h4>
+            <span class="text-xxs bg-emerald-500/10 text-emerald-600 px-2.5 py-1 rounded-full font-bold">Tiempo Real</span>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <!-- 1. Donut Chart - Capital vs Intereses -->
+            <div class="flex flex-col items-center justify-center p-5 rounded-2xl glass-subcard">
+              <span class="text-xs font-semibold text-slate-500 mb-4 block text-center">Estructura del Desembolso Total</span>
+              <div class="relative w-40 h-40">
+                <svg viewBox="0 0 100 100" class="w-full h-full transform -rotate-90">
+                  <circle cx="50" cy="50" r="40" fill="none" class="stroke-slate-100 dark:stroke-slate-850" stroke-width="8" id="donut-bg-circle" />
+                  
+                  <!-- Segmento Capital -->
+                  <circle
+                    cx="50"
+                    cy="50"
+                    r="40"
+                    fill="none"
+                    stroke="#10b981"
+                    stroke-width="8"
+                    stroke-dasharray="251.3"
+                    stroke-dashoffset="0"
+                    id="donut-segment-capital"
+                  />
+                  
+                  <!-- Segmento Interés -->
+                  <circle
+                    cx="50"
+                    cy="50"
+                    r="40"
+                    fill="none"
+                    stroke="#f59e0b"
+                    stroke-width="8"
+                    stroke-dasharray="251.3"
+                    stroke-dashoffset="0"
+                    id="donut-segment-interest"
+                  />
+                </svg>
+
+                <div class="absolute inset-0 flex flex-col items-center justify-center text-center">
+                  <span class="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Intereses</span>
+                  <span class="text-xl font-black text-slate-700 dark:text-white font-mono-custom" id="donut-interest-pct">--</span>
+                  <span class="text-[9px] text-slate-400 mt-0.5" id="donut-interest-caption">del préstamo</span>
+                </div>
+              </div>
+              <div class="flex gap-4 mt-4 text-xxs font-semibold">
+                <div class="flex items-center gap-1.5">
+                  <span class="w-3 h-3 bg-emerald-500 rounded-full"></span>
+                  <span class="text-slate-500" id="donut-legend-cap">Capital (--)</span>
+                </div>
+                <div class="flex items-center gap-1.5">
+                  <span class="w-3 h-3 bg-amber-500 rounded-full"></span>
+                  <span class="text-slate-500" id="donut-legend-int">Intereses (--)</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- 2. Curva de saldo de amortización interactivo (Evolución temporal) -->
+            <div class="flex flex-col justify-between p-5 rounded-2xl glass-subcard">
+              <div>
+                <span class="text-xs font-semibold text-slate-500 mb-1.5 block text-center">Curva de Balance Pendiente</span>
+                <p class="text-[10px] text-slate-400 text-center mb-3" id="curve-term-desc">Reducción del saldo del préstamo a lo largo de 20 años</p>
+              </div>
+
+              <div class="w-full bg-transparent p-1 flex items-end justify-center h-32 border-b border-l border-slate-300/30 gap-1" id="visual-bars-container">
+                <!-- Bars will load dynamically from Javascript to perform beautifully and offline without external files -->
+              </div>
+
+              <div class="flex justify-between text-[10px] text-slate-400 mt-2 px-1 font-mono-custom">
+                <span>Inicio (Mes 1)</span>
+                <span>Plazo Medio</span>
+                <span id="curve-end-text">Liquidado (240 m)</span>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Consejos de Salud e Inteligencia Financiera -->
+        <div class="p-6 rounded-3xl border shadow-md glass-panel" id="rules-advice-panel">
+          <div class="flex items-center gap-2.5 mb-4">
+            <span class="text-emerald-500 text-lg">💡</span>
+            <h4 class="font-extrabold font-display tracking-tight text-emerald-950 dark:text-emerald-300">Inteligencia y Salud Financiera</h4>
+          </div>
+
+          <div class="space-y-4" id="advice-renders-container">
+            <!-- Will render dynamically from JS -->
+          </div>
+        </div>
+
+      </section>
+
+    </div>
+
+    <!-- Tabla completa Amortización Francesa -->
+    <section class="p-6 rounded-3xl border shadow-lg glass-panel" id="amortization-table-card">
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 pb-4 border-b border-dashed border-slate-200/50">
+        <div>
+          <div class="flex items-center gap-2 text-slate-400 font-bold text-xs uppercase tracking-wider mb-0.5">
+            <span>📊 Plan de Pagos Mensual</span>
+          </div>
+          <h3 class="font-bold text-xl font-display text-emerald-950 dark:text-white">Tabla de Amortización Francesa</h3>
+          <p class="text-xs text-slate-400 mt-1">Garantiza el control exacto mensual sobre la evolución del balance de deuda acumulada.</p>
+        </div>
+
+        <button
+          onclick="handleExportCSV()"
+          class="glass-button-secondary"
+          id="btn-export-csv"
+        >
+          <span>Exportar a Excel (CSV)</span>
+        </button>
+      </div>
+
+      <div class="overflow-x-auto rounded-2xl border border-slate-200/30 shadow-inner">
+        <table class="w-full text-left text-xs border-collapse">
+          <thead>
+            <tr class="font-bold border-b text-xxs uppercase tracking-wider bg-slate-50/50 text-slate-500" id="tbl-header-row">
+              <th class="p-3.5 pl-4">Mes No.</th>
+              <th class="p-3.5">Pago Mensual</th>
+              <th class="p-3.5">Tasa Interés Cobrada</th>
+              <th class="p-3.5">Abono a Capital</th>
+              <th class="p-3.5">Saldo Pendiente</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100" id="amortization-table-body">
+            <!-- Will render dynamically -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="bg-indigo-950 dark:bg-slate-950 border-t border-slate-900 text-slate-400 text-xs py-10 mt-16 no-print">
+    <div class="max-w-7xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-4">
+      <div>
+        <p class="font-semibold text-slate-200 font-display text-sm">Simulador Inmobiliario Avanzado v2.0 - Offline/Portable</p>
+        <p class="text-slate-500 mt-0.5 text-[11px]">Asesor financiero autónomo interactivo, modular y responsive.</p>
+      </div>
+      <p class="text-slate-600 font-mono-custom text-xxs" id="footer-date-text">
+        Entorno de Simulación Autorizado
+      </p>
+    </div>
+  </footer>
+
+  <script>
+    // Variables de Estado de simulación
+    let activeTab = 'precio'; // 'precio' o 'cuota'
+    let darkMode = false;
+
+    // Reactivo local de inputs con valores por defecto coincidiendo con el avance
+    let state = {
+      salary: 3200,
+      additionalIncome: 450,
+      expenses: 900,
+      savings: 45000,
+      civilStatus: 'casado',
+      dependents: 1,
+      interestRate: 3.2,
+      termYears: 20,
+      propertyPrice: 250000,
+      downPaymentPercent: 20
+    };
+
+    // Al iniciar, poblar interfaz
+    window.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('print-date').innerText = "Generado el: " + new Date().toLocaleDateString('es-ES');
+      document.getElementById('footer-date-text').innerText = "Simulador Autónomo | " + new Date().getFullYear();
+      
+      calculateAll();
+    });
+
+    function toggleDarkMode() {
+      darkMode = !darkMode;
+      const body = document.body;
+      const themeToggle = document.getElementById('theme-toggle');
+      const themeIcon = document.getElementById('theme-icon');
+      const textTitle = document.getElementById('header-title');
+
+      if (darkMode) {
+        body.classList.add('dark');
+        themeIcon.innerText = "☀️";
+        themeToggle.className = "p-2.5 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 text-yellow-400 transition duration-300 cursor-pointer";
+        textTitle.className = "text-xl font-extrabold tracking-tight font-display bg-gradient-to-r from-emerald-400 to-teal-300 bg-clip-text text-transparent";
+        
+        // Dark classes overrides for vanilla html elements which are not fully glass/tailwind native
+        document.getElementById('tbl-header-row').className = "font-bold border-b text-xxs uppercase tracking-wider bg-black/40 text-slate-400 border-white/5";
+      } else {
+        body.classList.remove('dark');
+        themeIcon.innerText = "🌙";
+        themeToggle.className = "p-2.5 rounded-xl border border-slate-900/10 bg-slate-900/5 hover:bg-slate-900/10 text-emerald-700 transition duration-300 cursor-pointer";
+        textTitle.className = "text-xl font-extrabold tracking-tight font-display bg-gradient-to-r from-emerald-600 to-indigo-500 bg-clip-text text-transparent";
+
+        document.getElementById('tbl-header-row').className = "font-bold border-b text-xxs uppercase tracking-wider bg-slate-50/50 text-slate-500 border-slate-200/50";
+      }
+    }
+
+    function setActiveTab(tab) {
+      activeTab = tab;
+      
+      const tabPrecio = document.getElementById('tab-precio');
+      const tabCuota = document.getElementById('tab-cuota');
+      const groupCuota = document.getElementById('group-cuota-inputs');
+      const tabContainer = document.getElementById('mode-tabs');
+
+      if (tab === 'precio') {
+        tabPrecio.className = "flex-1 md:flex-initial text-center px-5 py-2.5 text-xs font-bold rounded-lg transition-all duration-200 cursor-pointer bg-white text-emerald-950 shadow-sm border border-emerald-100";
+        tabCuota.className = "flex-1 md:flex-initial text-center px-5 py-2.5 text-xs font-bold rounded-lg transition-all duration-200 cursor-pointer text-slate-500 hover:text-slate-700";
+        groupCuota.classList.add('hidden');
+      } else {
+        tabPrecio.className = "flex-1 md:flex-initial text-center px-5 py-2.5 text-xs font-bold rounded-lg transition-all duration-200 cursor-pointer text-slate-500 hover:text-slate-700";
+        tabCuota.className = "flex-1 md:flex-initial text-center px-5 py-2.5 text-xs font-bold rounded-lg transition-all duration-200 cursor-pointer bg-white text-emerald-950 shadow-sm border border-emerald-100";
+        groupCuota.classList.remove('hidden');
+      }
+
+      calculateAll();
+    }
+
+    function changeDependents(amount) {
+      state.dependents = Math.min(10, Math.max(0, state.dependents + amount));
+      document.getElementById('display-dependents').innerText = state.dependents;
+      calculateAll();
+    }
+
+    function onInputChanged(field, value) {
+      let numVal = parseFloat(value);
+      if (field === 'civilStatus') {
+        state[field] = value;
+      } else {
+        state[field] = isNaN(numVal) ? 0 : numVal;
+      }
+
+      // Sync specific ranges
+      if (field === 'salary') {
+        document.getElementById('range-salary').value = state.salary;
+      } else if (field === 'interestRate') {
+        document.getElementById('range-rate').value = state.interestRate;
+      } else if (field === 'downPaymentPercent') {
+        document.getElementById('range-dp-percent').value = state.downPaymentPercent;
+      }
+
+      calculateAll();
+    }
+
+    function onSliderChanged(field, value) {
+      let numVal = parseFloat(value);
+      state[field] = isNaN(numVal) ? 0 : numVal;
+
+      // Sync input fields
+      if (field === 'salary') {
+        document.getElementById('inp-salary').value = state.salary;
+      } else if (field === 'interestRate') {
+        document.getElementById('inp-rate').value = state.interestRate;
+      } else if (field === 'downPaymentPercent') {
+        document.getElementById('inp-dp-percent').value = state.downPaymentPercent;
+      }
+
+      calculateAll();
+    }
+
+    function syncMaxPriceToProperty() {
+      const results = runCalculations();
+      state.propertyPrice = results.maxPropertyPrice;
+      document.getElementById('inp-prop-price').value = state.propertyPrice;
+
+      if (results.maxPropertyPrice > 0) {
+        state.downPaymentPercent = Math.min(90, Math.max(10, Math.round((state.savings / results.maxPropertyPrice) * 100)));
+        document.getElementById('inp-dp-percent').value = state.downPaymentPercent;
+        document.getElementById('range-dp-percent').value = state.downPaymentPercent;
+      }
+
+      setActiveTab('cuota');
+    }
+
+    // Algoritmos de cálculo financiero idénticos al backend TS
+    function runCalculations() {
+      const totalIncome = state.salary + state.additionalIncome;
+      const availableIncome = Math.max(0, totalIncome - state.expenses);
+
+      // Endeudamiento sugerido por dependientes
+      let recommendedRatio = 0.40;
+      if (state.dependents === 1) recommendedRatio = 0.35;
+      else if (state.dependents === 2) recommendedRatio = 0.30;
+      else if (state.dependents >= 3) recommendedRatio = 0.25;
+
+      const maxRecommendedQuota = Math.round(availableIncome * recommendedRatio);
+
+      const r = (state.interestRate / 100) / 12;
+      const n = state.termYears * 12;
+
+      // Capital máximo financiable
+      let maxFinancedCapital = 0;
+      if (r > 0) {
+        maxFinancedCapital = maxRecommendedQuota * ((Math.pow(1 + r, n) - 1) / (r * Math.pow(1 + r, n)));
+      } else {
+        maxFinancedCapital = maxRecommendedQuota * n;
+      }
+      maxFinancedCapital = Math.round(Math.max(0, maxFinancedCapital));
+      const maxPropertyPrice = Math.round(maxFinancedCapital + state.savings);
+
+      // Modo cuota
+      const actualDownPayment = Math.round(state.propertyPrice * (state.downPaymentPercent / 100));
+      const actualFinancedCapital = Math.max(0, state.propertyPrice - actualDownPayment);
+
+      let actualQuota = 0;
+      let actualTotalPaid = 0;
+      let actualTotalInterest = 0;
+
+      if (actualFinancedCapital > 0) {
+        if (r > 0) {
+          actualQuota = actualFinancedCapital * ((r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1));
+        } else {
+          actualQuota = actualFinancedCapital / n;
+        }
+        actualQuota = Math.round(actualQuota);
+        actualTotalPaid = Math.round(actualQuota * n);
+        actualTotalInterest = Math.max(0, actualTotalPaid - actualFinancedCapital);
+      }
+
+      return {
+        totalIncome,
+        availableIncome,
+        recommendedRatio,
+        maxRecommendedQuota,
+        maxFinancedCapital,
+        maxPropertyPrice,
+        actualQuota,
+        actualFinancedCapital,
+        actualDownPayment,
+        actualTotalInterest,
+        actualTotalPaid
+      };
+    }
+
+    function calculateAll() {
+      // 1. Ejecutar fórmulas
+      const results = runCalculations();
+
+      // 2. Poblar indicadores de pantalla inputs
+      document.getElementById('indicator-salary').innerText = state.salary.toLocaleString('es-ES') + " €";
+      document.getElementById('indicator-savings').innerText = state.savings.toLocaleString('es-ES') + " €";
+      document.getElementById('indicator-rate').innerText = state.interestRate.toFixed(1) + "%";
+      document.getElementById('indicator-term-text').innerText = state.termYears + " años";
+      
+      const suggestedDownAmt = Math.round(state.propertyPrice * (state.downPaymentPercent / 100));
+      document.getElementById('indicator-dp-equivalent').innerText = `${suggestedDownAmt.toLocaleString('es-ES')} € (${state.downPaymentPercent}%)`;
+
+      // 3. Modificar visualización tarjetas clave según Pestaña activa
+      const cResult1 = document.getElementById('card-result-1');
+      const lblResult1 = document.getElementById('result-label-1');
+      const valResult1 = document.getElementById('result-val-1');
+      const descResult1 = document.getElementById('result-desc-1');
+
+      const cResult2 = document.getElementById('card-result-2');
+      const lblResult2 = document.getElementById('result-label-2');
+      const valResult2 = document.getElementById('result-val-2');
+      const descResult2 = document.getElementById('result-desc-2');
+      
+      const btnSync = document.getElementById('btn-sync-suggestion');
+
+      let currentCapital = 0;
+      let currentInterest = 0;
+
+      if (activeTab === 'precio') {
+        currentCapital = results.maxFinancedCapital;
+        currentInterest = Math.max(0, (results.maxRecommendedQuota * state.termYears * 12) - results.maxFinancedCapital);
+
+        lblResult1.innerText = "PRESUPUESTO TOPE RECOMENDADO";
+        valResult1.innerText = "€ " + results.maxPropertyPrice.toLocaleString('es-ES');
+        descResult1.innerText = `Asumiendo € ${state.savings.toLocaleString('es-ES')} de entrada directa y financiación bancaria prudente de € ${results.maxFinancedCapital.toLocaleString('es-ES')}.`;
+        
+        lblResult2.innerText = "CUOTA MAXIMA PERMITIDA";
+        valResult2.innerText = "€ " + results.maxRecommendedQuota.toLocaleString('es-ES') + " / mes";
+        valResult2.className = "text-3xl font-bold font-display tracking-tight text-emerald-500 font-mono-custom";
+        descResult2.innerText = `Límite prudencial óptimo de ${(results.recommendedRatio * 100).toFixed(0)}% según tu perfil económico familiar.`;
+
+        cResult2.className = "p-6 rounded-3xl border shadow-lg hover:shadow-xl hover:scale-[1.01] transition-all relative overflow-hidden group glass-panel border-slate-200/85";
+        btnSync.classList.remove('hidden');
+      } else {
+        currentCapital = results.actualFinancedCapital;
+        currentInterest = results.actualTotalInterest;
+
+        lblResult1.innerText = "CUOTA MENSUAL ESTIMADA";
+        valResult1.innerText = "€ " + results.actualQuota.toLocaleString('es-ES') + " / mes";
+        descResult1.innerText = `Pago mensual fijo calculado para amortizar el importe del capital del préstamo de € ${results.actualFinancedCapital.toLocaleString('es-ES')}.`;
+        
+        lblResult2.innerText = "PRECIO VIVIENDA ANALIZADA";
+        valResult2.innerText = "€ " + state.propertyPrice.toLocaleString('es-ES');
+        descResult2.innerText = `Vivienda comercial con entrada del ${state.downPaymentPercent}% equivalente a € ${results.actualDownPayment.toLocaleString('es-ES')}.`;
+
+        if (results.actualQuota > results.maxRecommendedQuota) {
+          // Riesgoso
+          valResult2.className = "text-3xl font-bold font-display tracking-tight text-red-500 font-mono-custom";
+          cResult2.className = "p-6 rounded-3xl border shadow-lg hover:shadow-xl hover:scale-[1.01] transition-all relative overflow-hidden group glass-panel bg-red-500/10 border-red-500/25";
+        } else {
+          // Seguro
+          valResult2.className = "text-3xl font-bold font-display tracking-tight text-emerald-500 font-mono-custom";
+          cResult2.className = "p-6 rounded-3xl border shadow-lg hover:shadow-xl hover:scale-[1.01] transition-all relative overflow-hidden group glass-panel border-slate-200/85";
+        }
+        btnSync.classList.add('hidden');
+      }
+
+      // 4. Poblar grid bento de métricas secundarias
+      document.getElementById('bento-val-1').innerText = "€ " + results.availableIncome.toLocaleString('es-ES');
+      document.getElementById('bento-val-2').innerText = (results.recommendedRatio * 100).toFixed(0) + "%";
+      document.getElementById('bento-val-3').innerText = "€ " + currentCapital.toLocaleString('es-ES');
+      document.getElementById('bento-val-4').innerText = "€ " + Math.round(currentInterest).toLocaleString('es-ES');
+
+      // 5. Graficar Donut (SVG dinámico)
+      const totalPayments = currentCapital + currentInterest;
+      const donutInterestLabel = document.getElementById('donut-interest-pct');
+      const donutLegendCap = document.getElementById('donut-legend-cap');
+      const donutLegendInt = document.getElementById('donut-legend-int');
+      
+      const donutCapitalSegment = document.getElementById('donut-segment-capital');
+      const donutInterestSegment = document.getElementById('donut-segment-interest');
+
+      if (totalPayments <= 0) {
+        donutInterestLabel.innerText = "0%";
+        donutLegendCap.innerText = "Capital (0%)";
+        donutLegendInt.innerText = "Intereses (0%)";
+        donutCapitalSegment.setAttribute('stroke-dashoffset', '251.3');
+        donutInterestSegment.setAttribute('stroke-dashoffset', '251.3');
+      } else {
+        const capPct = (currentCapital / totalPayments) * 100;
+        const intPct = (currentInterest / totalPayments) * 100;
+
+        donutInterestLabel.innerText = Math.round(intPct) + "%";
+        donutLegendCap.innerText = `Capital (${Math.round(capPct)}%)`;
+        donutLegendInt.innerText = `Intereses (${Math.round(intPct)}%)`;
+
+        const circum = 251.3;
+        const capOffset = circum - (capPct / 100) * circum;
+        const intOffset = circum - (intPct / 100) * circum;
+
+        donutCapitalSegment.setAttribute('stroke-dashoffset', capOffset);
+        donutInterestSegment.setAttribute('stroke-dashoffset', intOffset);
+        
+        // El segmento de interés debe estar desfasado por el segmento de capital para no superponerse
+        donutInterestSegment.setAttribute('stroke-dasharray', `${circum}`);
+        donutInterestSegment.setAttribute('stroke-dashoffset', `${capOffset + intOffset - circum}`);
+      }
+
+      // 6. Graficar Barras de Reducción Pendiente
+      const visualBars = document.getElementById('visual-bars-container');
+      visualBars.innerHTML = '';
+      
+      const scheduledMonths = state.termYears * 12;
+      document.getElementById('curve-term-desc').innerText = `Reducción del saldo del préstamo a lo largo de ${state.termYears} años`;
+      document.getElementById('curve-end-text').innerText = `Liquidado (${scheduledMonths} m)`;
+
+      const listAmortization = generateLocalSchedule(currentCapital, state.interestRate, state.termYears);
+      const sampleCount = 14;
+      const step = Math.max(1, Math.floor(listAmortization.length / sampleCount));
+
+      listAmortization.forEach((row, index) => {
+        if (index % step === 0 || index === listAmortization.length - 1) {
+          const heightRatio = currentCapital > 0 ? row.remainingBalance / currentCapital : 0;
+          const barHeightPercentage = Math.max(4, heightRatio * 100);
+
+          const bar = document.createElement('div');
+          bar.className = "flex-1 bg-emerald-500 rounded-t-sm hover:bg-emerald-600 transition-all cursor-pointer relative group";
+          bar.style.height = `${barHeightPercentage}%`;
+
+          // Tooltip flotante interactivo para simular el hover reactivo
+          const tooltip = document.createElement('div');
+          tooltip.className = "absolute bottom-full left-1/2 transform -translate-x-1/2 bg-slate-900 border border-white/10 text-white font-mono-custom text-[10px] px-2 py-1 rounded hidden group-hover:block whitespace-nowrap z-30 shadow-lg mb-1";
+          tooltip.innerText = `Mes ${row.installmentNumber}: €${Math.round(row.remainingBalance).toLocaleString('es-ES')}`;
+          
+          bar.appendChild(tooltip);
+          visualBars.appendChild(bar);
+        }
+      });
+
+      // 7. Renderizar consejos financieros inteligentes
+      renderAdviceCards(results);
+
+      // 8. Renderizar plan de amortización francesa completa
+      renderAmortizationBody(listAmortization);
+    }
+
+    function generateLocalSchedule(principal, annualRate, termYears) {
+      const schedule = [];
+      if (principal <= 0) return schedule;
+
+      const r = (annualRate / 100) / 12;
+      const totalMonths = termYears * 12;
+
+      let monthlyPayment = 0;
+      if (r > 0) {
+        monthlyPayment = principal * ((r * Math.pow(1 + r, totalMonths)) / (Math.pow(1 + r, totalMonths) - 1));
+      } else {
+        monthlyPayment = principal / totalMonths;
+      }
+
+      let remainingBalance = principal;
+
+      for (let month = 1; month <= totalMonths; month++) {
+        const interestPaid = r > 0 ? remainingBalance * r : 0;
+        let principalPaid = monthlyPayment - interestPaid;
+
+        if (month === totalMonths || remainingBalance < principalPaid) {
+          principalPaid = remainingBalance;
+          remainingBalance = 0;
+        } else {
+          remainingBalance -= principalPaid;
+        }
+
+        schedule.push({
+          installmentNumber: month,
+          payment: Math.round((principalPaid + interestPaid) * 100) / 100,
+          interest: Math.round(interestPaid * 100) / 100,
+          principal: Math.round(principalPaid * 100) / 100,
+          remainingBalance: Math.round(remainingBalance * 100) / 100
+        });
+
+        if (remainingBalance <= 0) break;
+      }
+
+      return schedule;
+    }
+
+    function renderAdviceCards(results) {
+      const adviceContainer = document.getElementById('advice-renders-container');
+      adviceContainer.innerHTML = '';
+
+      const advices = [];
+      const selectedQuota = activeTab === 'precio' ? results.maxRecommendedQuota : results.actualQuota;
+      const ratio = results.totalIncome > 0 ? selectedQuota / results.totalIncome : 0;
+      const ratioRec = results.recommendedRatio;
+
+      // 1. Ratio de endeudamiento
+      if (ratio > ratioRec) {
+        advices.push({
+          type: 'warning',
+          title: 'Alerta de sobreendeudamiento',
+          message: `El pago mensual estimado representa un ${(ratio * 100).toFixed(0)}% de tus ingresos, superando el límite prudencial de ${(ratioRec * 100).toFixed(0)}% establecido para tu situación familiar (${state.dependents} dependiente/s).`,
+          details: 'Para mitigar riesgos financieros, busca una vivienda de menor costo, incrementa el valor de la entrada inicial o amplía el plazo del préstamo.'
+        });
+      } else {
+        advices.push({
+          type: 'success',
+          title: 'Nivel de endeudamiento saludable',
+          message: `Tu cuota mensual de hipoteca representa un ${(ratio * 100).toFixed(0)}% de tus ingresos netos totales. Cabalga fluidamente tu capacidad óptima.`,
+          details: 'Esto te permite mantener un colchón de imprevistos líquidos mensuales, estudios domésticos o ahorros individuales.'
+        });
+      }
+
+      // 2. Costo del préstamo
+      if (state.termYears >= 25 && state.interestRate >= 2.5) {
+        advices.push({
+          type: 'info',
+          title: 'Optimización de Plazos e Intereses',
+          message: `Pagarás intereses elevados debido al plazo de liquidación largo (${state.termYears} años).`,
+          details: `Invertir parte del capital mensual adicional reduciendo el término disminuirá brutalmente los intereses totales del banco.`
+        });
+      }
+
+      // 3. Entrada recomendada (Regla 20%)
+      if (activeTab === 'cuota') {
+        if (state.downPaymentPercent < 20) {
+          const gapAmt = Math.round(state.propertyPrice * 0.20 - (state.propertyPrice * (state.downPaymentPercent / 100)));
+          advices.push({
+            type: 'warning',
+            title: 'Entrada menor al 20% bancario sugerido',
+            message: 'La mayoría de entidades del crédito penalizan perfiles LTV mayores al 80% con seguros o intereses aumentados.',
+            details: `Aportar € ${gapAmt.toLocaleString('es-ES')} más de fondos te evitará penalizaciones de tasación bancaria.`
+          });
+        }
+      }
+
+      // Dibujar en pantalla
+      advices.forEach(adv => {
+        const card = document.createElement('div');
+        
+        let borderClass = 'border-slate-200/50';
+        let barClass = 'bg-slate-400';
+        let textClass = 'text-neutral-900 dark:text-slate-100';
+        let cardBgClass = 'bg-slate-100/30';
+
+        if (adv.type === 'warning') {
+          borderClass = 'border-amber-500/20';
+          barClass = 'bg-amber-500';
+          cardBgClass = 'bg-amber-500/10';
+        } else if (adv.type === 'success') {
+          borderClass = 'border-emerald-500/25';
+          barClass = 'bg-emerald-500';
+          cardBgClass = 'bg-emerald-500/10';
+        } else if (adv.type === 'info') {
+          borderClass = 'border-blue-500/25';
+          barClass = 'bg-blue-500';
+          cardBgClass = 'bg-blue-500/10';
+        }
+
+        card.className = `flex gap-3.5 p-4 rounded-2xl border transition duration-200 ${cardBgClass} ${borderClass}`;
+        card.innerHTML = `
+          <div class="w-1.5 h-auto rounded-full shrink-0 ${barClass}"></div>
+          <div class="space-y-1">
+            <h5 class="font-bold text-xs font-display ${textClass}">${adv.title}</h5>
+            <p class="text-xs font-semibold opacity-90">${adv.message}</p>
+            <p class="text-[10px] opacity-75 leading-relaxed font-normal">${adv.details}</p>
+          </div>
+        `;
+        adviceContainer.appendChild(card);
+      });
+    }
+
+    function renderAmortizationBody(schedule) {
+      const tableBody = document.getElementById('amortization-table-body');
+      tableBody.innerHTML = '';
+
+      if (schedule.length === 0) {
+        tableBody.innerHTML = `
+          <tr>
+            <td colspan="5" class="p-6 text-center text-slate-400 font-medium">
+              Por favor completa ingresos y montos válidos para construir la tabla de amortización automatizada.
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      // Mostramos los primeros 48 meses para no quebrar el rendimiento de DOM independiente
+      const rowsToShow = schedule.slice(0, 48);
+
+      rowsToShow.forEach(row => {
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-emerald-500/5 transition-all font-mono-custom text-slate-600 dark:text-slate-350 border-b border-slate-200/20 dark:border-white/5";
+        
+        tr.innerHTML = `
+          <td class="p-3.5 pl-4 font-bold text-slate-400">${row.installmentNumber}</td>
+          <td class="p-3.5 font-bold text-slate-900 dark:text-white">€ ${Math.round(row.payment).toLocaleString('es-ES')}</td>
+          <td class="p-3.5 text-amber-600 dark:text-amber-500">€ ${Math.round(row.interest).toLocaleString('es-ES')}</td>
+          <td class="p-3.5 text-emerald-600 dark:text-emerald-400 font-semibold">€ ${Math.round(row.principal).toLocaleString('es-ES')}</td>
+          <td class="p-3.5 font-bold text-slate-755 dark:text-slate-400">€ ${Math.round(row.remainingBalance).toLocaleString('es-ES')}</td>
+        `;
+        tableBody.appendChild(tr);
+      });
+
+      if (schedule.length > 48) {
+        const alertRow = document.createElement('tr');
+        alertRow.className = "bg-slate-500/5 no-print";
+        alertRow.innerHTML = `
+          <td colspan="5" class="p-4 text-center font-bold text-[11px] text-slate-450 uppercase tracking-wide">
+            Se muestran las primeras 48 cuotas del plan temporal para conservar alta fluidez. Exporta a CSV/Excel para obtener la totalidad de las <b>${schedule.length}</b> cuotas completas.
+          </td>
+        `;
+        tableBody.appendChild(alertRow);
+      }
+    }
+
+    function handleExportCSV() {
+      const results = runCalculations();
+      const currentCapital = activeTab === 'precio' ? results.maxFinancedCapital : results.actualFinancedCapital;
+      const fullSchedule = generateLocalSchedule(currentCapital, state.interestRate, state.termYears);
+
+      const csvRows = [
+        ['Numero de Cuota', 'Cuota de Pago (EUR)', 'Interes Cobrado (EUR)', 'Capital Amortizado (EUR)', 'Balance Pendiente (EUR)']
+      ];
+
+      fullSchedule.forEach(row => {
+        csvRows.push([
+          row.installmentNumber.toString(),
+          row.payment.toFixed(2),
+          row.interest.toFixed(2),
+          row.principal.toFixed(2),
+          row.remainingBalance.toFixed(2)
+        ]);
+      });
+
+      const csvContent = "\uFEFF" + csvRows.map(e => e.join(",")).join("\n");
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.setAttribute("href", url);
+      link.setAttribute("download", `Tabla_Amortizacion_Hipotecaria_${state.termYears}_anos_portable.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+  </script>
+</body>
+</html>
